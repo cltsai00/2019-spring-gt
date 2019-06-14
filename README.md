@@ -20,11 +20,9 @@ Graph Theory (EE6622E) in National Cheng Kung University.
 1. 將topo.txt以interpret存入建圖  
 2. 以動態的一維陣列degree存放各點的degree  
 3. 找出odd degree的點存入Vertex odd_degree_node中  
-4. 將odd_degree_node中的node兩兩matching，以二維vector avail_paths保存find_path function找到每條路徑，並比較出當  
-   中最短的路徑存在二維vector  shortest_paths中  
+4. 將odd_degree_node中的node兩兩matching，以二維vector avail_paths保存find_path function找到每條路徑，並比較出當中最短的路徑存在二維vector  shortest_paths中  
 5. 從原點開始往後逐一檢查與其他node有無連接，連接則將兩個點的雙向edge進行disconnect，並將此路徑push到存放結
-   果的vector result當中，並將被連接到的點設為current node，在向後進行檢查，若後面沒有和他相連的點，則在從頭開  
-   始找下一個點，並重複disconnect及push等動作  
+   果的vector result當中，並將被連接到的點設為current node，在向後進行檢查，若後面沒有和他相連的點，則在從頭開始找下一個點，並重複disconnect及push等動作  
 6. 將result vector的結果輸出至result.txt  
 
 #### function介紹  
