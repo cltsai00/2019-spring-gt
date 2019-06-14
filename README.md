@@ -36,15 +36,16 @@ Graph Theory (EE6622E) in National Cheng Kung University.
 -------  
 1.input file - topo.txt  
 
------
-|a b |
-|b c |
-|b d |
-|b g |
-|c g |
-|d e |  
-|d f |  
-|e f |  
-----
 
-2.output on terminal  
+   |a b |  
+   |b c |  
+   |b d |  
+   |b g |  
+   |c g |  
+   |d e |    
+   |d f |    
+   |e f |    
+
+------
+2.output on terminal   
+  https://github.com/cltsai00/2019-spring-gt/blob/master/figure/result.PNG
