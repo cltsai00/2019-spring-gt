@@ -13,61 +13,71 @@ using namespace std;
 // create NetworkManager first
 NetworkManager *nm = new NetworkManager();
 
-vector<string> result;
+vector<string> result;//record result path
+int find_result(int& i,int& tmp_node,string &current, vector<string>nn,int *degree);
+int count_degree(int*degree,int i);
+int od=0;//# of odd degree node
 
-string find_result(int i,int tmp,string current, vector<string>nn,int *degree);
-int count_degree(int*degree);
 
 int main(int argc, char** argv){
-    string current_node("a");
+
     /* start your program */
-    nm->interpret("topo.txt");
-//    nm->print_all_v();
-//    nm->print_all_e();
+    nm->interpret("topo.txt");//read the file
+
     Vertex* node = nm->get_all_nodes();
-    vector<string> node_v;//node name
+
+    vector<string> node_v;//save node name to a vector
     while(node!=NULL){
       node_v.push_back(node->name);
       node=node->next;
     }
-    vector<vector<Edge*>> avail_paths;
-    vector<vector<Edge*>> shortest_paths(1,vector<Edge*>(node_v.size())); 
+
+    vector<vector<Edge*>> avail_paths;// tmp path
+    vector<vector<Edge*>> shortest_paths(10,vector<Edge*>(node_v.size())); ///shortest path
     Path *path;
     path=new Path();
-    path->append(nm->elist);
 
+        
+    string current_node(node_v[0]);//first node read in .txt us the origin
 
-    int *degree;
-    degree = new int [node_v.size()];//degree of each node
+    int *degree;//degree of each node are initialed to 0
+    degree = new int [node_v.size()];
     for(int i=0;i<node_v.size();i++)
       degree[i]=0;
-//find the number of nodes with odd edges
-    int odd_node_count=0;//# of node with odd degrees
 
+
+//find the number of nodes with odd edges
+   
+
+  int odd_node_count=0;//# of node with odd degrees
     for(int i=0;i<node_v.size()-1;i++){
       for(int j=i+1;j<node_v.size();j++){
         if(nm->connected(node_v[i],node_v[j])==0){
           if(nm->connected_d(node_v[j],node_v[i])==0)
-            nm->connect(node_v[i],node_v[i]);
+            nm->connect(node_v[i],node_v[i]);//as undirected graph, connect the other direction
           else if(nm->connected_d(node_v[i],node_v[j])==0)
-            nm->connect(node_v[j],node_v[i]);
+            nm->connect(node_v[j],node_v[i]);//as undirected graph, connect the other direction
           degree[i]++;
           degree[j]++;
-       }   
+        }   
       }
-      if(degree[i]%2==1)
+
+      if(degree[i]%2==1)//count # of node with odd degree 
         odd_node_count++;
+
     }
-    for(int i=0;i<node_v.size();i++){
-      cout<<"degree of "<< node_v[i]<<" = "<<degree[i]<<endl;
-}
+    
+      for(int i=0;i<node_v.size();i++){
+        cout<<"degree of "<< node_v[i]<<" = "<<degree[i]<<endl;
+      }
+
    cout << "# of nodes is " <<node_v.size()<<endl;
-//not Euler (add edge to node with odd degrees and find euler path)
+
+//if a graph has nodes with odd degree, it's not Euler (add edge to node with odd degrees )
     if(odd_node_count!=0){
 
 //find node with odd degree
     Vertex *odd_degree_node[odd_node_count];
-    int od=0;
     for(int i=0;i<node_v.size();i++){
       if(degree[i]%2==1){
         odd_degree_node[od]=nm->vlist[i];
@@ -76,16 +86,17 @@ int main(int argc, char** argv){
       }
     }
         cout<<"# of odd degree node is "<<od<<endl;
-//find edge that should be walked several times
 
-//avail_paths = path->find_paths(node_v[2],node_v[3]);
-//path->debug();
 
+//find edge that should be walked several times(match nodes with odd degree)
+
+//find path
     int s=0;
+    path->append(nm->elist);
     for(int i=0;i<od;i=i+2){
         avail_paths = path->find_paths(odd_degree_node[i]->name,odd_degree_node[i+1]->name);
         path->debug();
-//        cout<<avail_paths[0].size()<<endl;
+
         for(int k=0;k<avail_paths.size();k++){
           if(shortest_paths[s].size()>avail_paths[k].size()){
             shortest_paths.at(s)=avail_paths.at(k);
@@ -94,21 +105,20 @@ int main(int argc, char** argv){
             s++;
     } 
 
+//connect nodes matched
     for(int i=0;i<od/2;i++){
          for(int n=0;n<shortest_paths[i].size();n++){
          nm->connect_r(shortest_paths.at(i).at(n)->head->name,shortest_paths.at(i).at(n)->tail->name);
-//         cout<<shortest_paths.at(i).at(n)->head->name<<shortest_paths.at(i).at(n)->tail->name<<endl;
- }
-}
+         cout<<shortest_paths.at(i).at(n)->head->name<<shortest_paths.at(i).at(n)->tail->name<<endl;
+         }
+     }
     }
-cout<<shortest_paths.size()<<endl;
- //   shortest_paths size problem
-    for(int i=0;i<shortest_paths.size();i++){
 
+//record degree after matching
+    for(int i=0;i<od/2;i++){
       for(int j=0;j<shortest_paths[i].size();j++){
-     cout<<"2 ";
         for(int k=0;k<node_v.size();k++){ 
-          if(shortest_paths.at(i).at(j)->head->name==node_v[k]||shortest_paths.at(i).at(j)->tail->name==node_v[k]) degree[k]++; 
+          if(shortest_paths.at(i).at(j)->head->name==node_v[k]||shortest_paths.at(i).at(j)->tail->name==node_v[k]) degree[k]++;
    }
   }
  }
@@ -118,64 +128,81 @@ cout<<shortest_paths.size()<<endl;
 }
 
 
-
-
-//     nm->connect_r(shortest_paths[0][0]->head->name,shortest_paths[0][0]->tail->name);
-//     nm->print_all_v();
-//     nm->print_all_e();
-
-//find euler cycle with and without odd node
-
+//find euler cycle 
 
 int tmp_node=0;//# of last node
 
-
-    result.push_back(node_v[0]);
+    result.push_back(current_node);//push the origin to reault vector
 
 int total_degree;
-//        if(nm->connected(current_node,node_v[1])==0&&node_v[1]!=result.back())
-//          find_result(1,tmp_node,current_node,node_v,degree);
-//        total_degree=count_degree(degree);
+    total_degree=count_degree(degree,node_v.size());
+    cout<<"total degree:  "<<total_degree<<endl;
 
-     nm->print_all_e();
-/*
-   while(total_degree!=0){
-      for(int i=0;i<node_v.size();i++){
-        if(nm->connected(current_node,node_v[i])==0&&node_v[i]!=result.back()){
-          current_node = find_result(i,tmp_node,current_node,node_v,degree);
-          }
-        else if(nm->connected(current_node,node_v[i])==0&&degree[i]==1){
-          current_node = find_result(i,tmp_node,current_node,node_v,degree);
-}
-        total_degree=count_degree(degree);
-//        cout<<"total_degree is "<<total_degree<<endl<<"current_node is "<<current_node<<endl;
-//   for(int i=0;i<result.size();i++){
-//    cout<<result.at(i)<<"->";
-//}
+  
+int ii;      
+int back=0;//next node is back or front
+
+//find result path
+  for(int i=0;i<total_degree/2;i++) {
+      int back=0;
+       for( ii=tmp_node;ii<node_v.size();ii++){//next node is back 
+        if(nm->connected(current_node,node_v[ii])==0){
+          if(degree[ii]>0){
+          back=find_result(ii,tmp_node,current_node, node_v, degree);
+          break;
+       }
+    }              
   }
-cout<<endl; 
-nm->print_all_e();
-}*/
-   //cout<<"total_degree is "<<total_degree<<endl;
+     if(back==0){//next node is front
+       for(int k=0;k<node_v.size();k++){
+         if(nm->connected(current_node,node_v[k])==0){
+           if(degree[k]>0){
+             back=find_result(k,tmp_node,current_node, node_v, degree);
+             break;
+           }
+         }
+       }
+     }
+  }
 
+//print result
+   cout<<endl<<endl<<endl<<endl<<"-----------------------result-----------------------"<<endl<<endl<<endl<<endl;
+ for(int i=0;i<result.size();i++){
+       cout << result.at(i)<<" -> ";
+      }
+  cout<<endl<<endl<<endl<<endl;
+
+
+//output result.txt
+     string output_result = "result.txt";
+     ofstream out(output_result.c_str());
+     for(int i=0;i<result.size()-1;i++){
+       out << result.at(i)<<" -> ";
+      }
+     out<<result.back();
     return 0;
 
 }
 
+//disconnect edge walkedthrough and push to result vector
+int find_result(int &ii,int& tmp_node,string &current_node, vector<string>nn,int* degree){
 
-string find_result(int i,int tmp,string current, vector<string>nn,int* degree){
-        nm->disconnect(current,nn[i]);
-        nm->disconnect(nn[i],current);
-        result.push_back(nn[i]);
-        current = nn[i];
-        degree[tmp]--;
-        degree[i]--;
-        cout<<"current node is"<<current;
-        return current; 
+          nm->disconnect(current_node,nn[ii]);
+          nm->disconnect(nn[ii],current_node);
+          result.push_back(nn[ii]);
+          current_node = nn[ii];
+          degree[tmp_node]--;
+          degree[ii]--;
+          tmp_node=ii;
+          return 1;
+
+     
       }
-int count_degree(int* degree){
+
+//count total degree
+int count_degree(int* degree,int i){
     int total=0;
-    for(int j=0;j<sizeof(degree);j++)
+    for(int j=0;j<i;j++)
       total+=degree[j];
     return total;
 }
