@@ -48,4 +48,4 @@ Graph Theory (EE6622E) in National Cheng Kung University.
 
 ------
 2.output on terminal   
-  https://github.com/cltsai00/2019-spring-gt/blob/master/figure/result.PNG
+  ![image](https://github.com/cltsai00/2019-spring-gt/blob/master/figure/result.PNG)
