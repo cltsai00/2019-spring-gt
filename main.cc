@@ -167,8 +167,9 @@ int back=0;//next node is back or front
 
 //print result
    cout<<endl<<endl<<endl<<endl<<"-----------------------result-----------------------"<<endl<<endl<<endl<<endl;
- for(int i=0;i<result.size();i++){
-       cout << result.at(i)<<" -> ";
+ cout<<result.at(0);
+ for(int i=1;i<result.size();i++){
+       cout << " -> "<<result.at(i);
       }
   cout<<endl<<endl<<endl<<endl;
 
